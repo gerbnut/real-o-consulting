@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real O- | Operational Consulting</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: '#C9A96E',
+            'gold-faint': 'rgba(201,169,110,0.15)',
+            'gold-divider': 'rgba(201,169,110,0.2)',
+            cream: '#F5F0EB',
+            muted: '#8A8478',
+            surface: '#141414',
+            'surface-2': '#1C1C1C',
+            base: '#0D0D0D',
+          },
+          fontFamily: {
+            serif: ['Syne', 'system-ui', 'sans-serif'],
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Base resets */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #0D0D0D;
+      color: #F5F0EB;
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Gold rule */
+    .rule-gold {
+      width: 60px;
+      height: 1px;
+      background: #C9A96E;
+      display: block;
+    }
+    .rule-gold-full {
+      width: 100%;
+      height: 1px;
+      background: rgba(201,169,110,0.3);
+      display: block;
+    }
+
+    /* Nav */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    #nav.scrolled {
+      background: rgba(13,13,13,0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 1px 0 rgba(201,169,110,0.15);
+    }
+
+    /* Hero radial glow */
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,169,110,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    /* Noise overlay */
+    .noise-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Fade-in on load */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+    .fade-in-1 { animation-delay: 0.1s; }
+    .fade-in-2 { animation-delay: 0.3s; }
+    .fade-in-3 { animation-delay: 0.5s; }
+    .fade-in-4 { animation-delay: 0.7s; }
+    .fade-in-5 { animation-delay: 0.9s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Service card gold top border */
+    .service-card {
+      background: #141414;
+      border: 1px solid rgba(201,169,110,0.12);
+      border-top: 2px solid #C9A96E;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    .service-card:hover {
+      border-color: rgba(201,169,110,0.4);
+      transform: translateY(-3px);
+    }
+
+    /* Team card */
+    .team-card {
+      background: #141414;
+      border: 1px solid rgba(201,169,110,0.1);
+      transition: border-color 0.25s ease, transform 0.25s ease;
+      overflow: hidden;
+    }
+    .team-card:hover {
+      border-color: rgba(201,169,110,0.45);
+      transform: translateY(-4px);
+    }
+    .team-card:hover .team-img {
+      transform: scale(1.04);
+    }
+    .team-img {
+      transition: transform 0.5s ease;
+    }
+
+    /* Image gradient overlay */
+    .img-gradient {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(to top, #141414 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* Stat block */
+    .stat-block {
+      border-left: 2px solid rgba(201,169,110,0.3);
+      padding-left: 1.25rem;
+    }
+
+    /* Ghost button */
+    .btn-ghost {
+      border: 1px solid #C9A96E;
+      color: #C9A96E;
+      background: transparent;
+      letter-spacing: 0.08em;
+      transition: background 0.2s ease, color 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-ghost:hover {
+      background: #C9A96E;
+      color: #0D0D0D;
+    }
+
+    /* Solid gold button */
+    .btn-gold {
+      background: #C9A96E;
+      color: #0D0D0D;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      transition: background 0.2s ease, transform 0.15s ease;
+      cursor: pointer;
+    }
+    .btn-gold:hover {
+      background: #d4b67e;
+      transform: translateY(-1px);
+    }
+
+    /* Scroll-reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Small caps label */
+    .label-sm {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #C9A96E;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8A8478;
+      border: 1px solid rgba(201,169,110,0.2);
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    /* Section padding */
+    section { padding: 5.5rem 0; }
+
+    @media (max-width: 768px) {
+      section { padding: 3.5rem 0; }
+    }
+
+    /* Fluid type */
+    .hero-headline {
+      font-size: clamp(1.875rem, 3.3vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+    .section-headline {
+      font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+    .contact-headline {
+      font-size: clamp(2rem, 3.5vw, 3.5rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body class="bg-base">
+
+  <!-- ═══════════════════════════════════════════
+       NAV
+  ═══════════════════════════════════════════ -->
+  <nav id="nav" class="py-5 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="font-serif text-xl text-gold tracking-wide" style="font-weight: 800; letter-spacing: 0.02em;">Real O-</a>
+      <a href="#contact" class="btn-ghost text-xs px-5 py-2.5 hidden sm:inline-block" style="font-family: 'Inter', sans-serif; font-weight: 500;">Contact Us</a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════ -->
+  <section id="hero" class="relative flex items-center justify-center min-h-screen text-center" style="padding: 0;">
+    <div class="hero-glow"></div>
+    <div class="noise-overlay"></div>
+
+    <div class="relative z-10 px-6 max-w-4xl mx-auto">
+      <span class="rule-gold mx-auto mb-8 fade-in fade-in-1"></span>
+
+      <h1 class="font-serif text-cream mb-6 fade-in fade-in-2 hero-headline">
+        We fix what your last<br>consultant broke.
+      </h1>
+
+      <p class="text-muted text-lg md:text-xl max-w-2xl mx-auto mb-4 fade-in fade-in-3" style="font-weight: 300; line-height: 1.7;">
+        Real operations. For businesses serious enough to admit they have a problem.
+      </p>
+
+      <p class="text-muted text-sm mb-10 fade-in fade-in-4" style="opacity: 0.6;">
+        *Results may vary. Our confidence does not.
+      </p>
+
+      <a href="#services" class="btn-gold inline-block text-sm px-8 py-3.5 fade-in fade-in-5" style="font-family: 'Inter', sans-serif;">
+        See Our Work
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SERVICES
+  ═══════════════════════════════════════════ -->
+  <section id="services" class="bg-surface">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+
+      <div class="mb-14 reveal">
+        <span class="label-sm block mb-4">The Work</span>
+        <h2 class="font-serif text-cream section-headline">
+          We've seen your operation.<br>We have notes.
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Card 1 -->
+        <div class="service-card p-8 reveal reveal-delay-1">
+          <div class="mb-5">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 14h20M4 8h12M4 20h16" stroke="#C9A96E" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl text-cream mb-3" style="font-weight: 800; letter-spacing: -0.01em;">Cut the Fat</h3>
+          <p class="text-muted text-sm leading-relaxed" style="font-weight: 300;">
+            We identify what's costing you money and tell you to stop doing it. This sounds obvious. That's because it is. You're welcome.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="service-card p-8 reveal reveal-delay-2">
+          <div class="mb-5">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="14" cy="14" r="10" stroke="#C9A96E" stroke-width="1.5"/>
+              <path d="M14 9v5l3 3" stroke="#C9A96E" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl text-cream mb-3" style="font-weight: 800; letter-spacing: -0.01em;">Fix the Machine</h3>
+          <p class="text-muted text-sm leading-relaxed" style="font-weight: 300;">
+            We map your processes, locate the bottlenecks, and restructure them. Then we send an invoice. Sometimes in that order.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="service-card p-8 reveal reveal-delay-3">
+          <div class="mb-5">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 20l6-8 4 4 4-8" stroke="#C9A96E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="22" cy="8" r="2" fill="#C9A96E"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl text-cream mb-3" style="font-weight: 800; letter-spacing: -0.01em;">Raise the Bar</h3>
+          <p class="text-muted text-sm leading-relaxed" style="font-weight: 300;">
+            Six consultants who train. Four with finance backgrounds. Two with law-adjacent credentials. All very opinionated about your KPIs.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       ABOUT
+  ═══════════════════════════════════════════ -->
+  <section id="about">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start">
+
+        <!-- Left: Text -->
+        <div class="reveal">
+          <span class="label-sm block mb-6">About</span>
+          <h2 class="font-serif text-cream mb-8 section-headline">
+            Rare Chemistry.<br>Genuine Results.<br>Suspicious Credentials.
+          </h2>
+          <div class="space-y-5 text-muted text-sm leading-relaxed" style="font-weight: 300;">
+            <p>
+              Real O- was founded by six men from Northern Highlands Regional High School, Class of 2018 — a graduating class widely regarded by its own members as the finest collection of raw talent ever to emerge from New Jersey.
+            </p>
+            <p>
+              We are physically fit. We are well-educated. We attended schools you've heard of and worked at firms you respect.
+            </p>
+            <p>
+              Together, we bring a combined 47 years of experience across financial services, law, real estate, technology, and competitive athletics — a combination so rare it is almost certainly worth whatever we charge you.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Stats -->
+        <div class="grid grid-cols-2 gap-x-8 gap-y-10 pt-2 reveal">
+          <div class="stat-block">
+            <div class="font-serif text-5xl text-gold mb-1" style="font-weight: 900;">6</div>
+            <div class="text-muted text-xs uppercase tracking-widest">Consultants</div>
+          </div>
+          <div class="stat-block">
+            <div class="font-serif text-5xl text-gold mb-1" style="font-weight: 900;">1</div>
+            <div class="text-muted text-xs uppercase tracking-widest">Conference Championship</div>
+          </div>
+          <div class="stat-block">
+            <div class="font-serif text-5xl text-gold mb-1" style="font-weight: 900;">47</div>
+            <div class="text-muted text-xs uppercase tracking-widest">Combined Years Experience<br><span style="opacity: 0.6;">(on paper)</span></div>
+          </div>
+          <div class="stat-block">
+            <div class="font-serif text-5xl text-gold mb-1" style="font-weight: 900;">0</div>
+            <div class="text-muted text-xs uppercase tracking-widest">Excuses Made</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       TEAM
+  ═══════════════════════════════════════════ -->
+  <section id="team" class="bg-surface">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+
+      <div class="mb-14 reveal">
+        <span class="label-sm block mb-4">The People</span>
+        <h2 class="font-serif text-cream section-headline">
+          Individually impressive. Collectively unstoppable. Occasionally available.
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-5">
+
+        <!-- Jason Mindich -->
+        <div class="team-card reveal reveal-delay-1">
+          <div class="relative" style="aspect-ratio: 3/4; overflow: hidden;">
+            <img src="brand_assets/Jason Mindich.png" alt="Jason Mindich" class="team-img w-full h-full object-cover object-top">
+            <div class="img-gradient"></div>
+          </div>
+          <div class="p-5 pt-3">
+            <h3 class="font-serif text-lg text-cream mb-0.5" style="font-weight: 800; letter-spacing: -0.01em;">Jason Mindich</h3>
+            <div class="text-gold text-xs mb-2" style="font-weight: 500; letter-spacing: 0.04em;">Managing Principal</div>
+            <span class="badge mb-3">ex-JP Morgan</span>
+            <p class="text-muted text-xs leading-relaxed mt-2" style="font-weight: 300;">
+              "Handled seven figure portfolios and multiple sacks of balls."
+            </p>
+          </div>
+        </div>
+
+        <!-- Henry Riccitelli -->
+        <div class="team-card reveal reveal-delay-2">
+          <div class="relative" style="aspect-ratio: 3/4; overflow: hidden;">
+            <img src="brand_assets/Henry Riccitelli.png" alt="Henry Riccitelli" class="team-img w-full h-full object-cover object-top">
+            <div class="img-gradient"></div>
+          </div>
+          <div class="p-5 pt-3">
+            <h3 class="font-serif text-lg text-cream mb-0.5" style="font-weight: 800; letter-spacing: -0.01em;">Henry Riccitelli</h3>
+            <div class="text-gold text-xs mb-2" style="font-weight: 500; letter-spacing: 0.04em;">Chief Legal Strategist</div>
+            <span class="badge mb-3">ESQ.</span>
+            <p class="text-muted text-xs leading-relaxed mt-2" style="font-weight: 300;">
+              "A Minorities worst nightmare."
+            </p>
+          </div>
+        </div>
+
+        <!-- Matty "Mike" Ice -->
+        <div class="team-card reveal reveal-delay-3">
+          <div class="relative" style="aspect-ratio: 3/4; overflow: hidden;">
+            <img src='brand_assets/Matty "Mike" Ice.jpg' alt='Matty "Mike" Ice' class="team-img w-full h-full object-cover object-top">
+            <div class="img-gradient"></div>
+          </div>
+          <div class="p-5 pt-3">
+            <h3 class="font-serif text-lg text-cream mb-0.5" style="font-weight: 800; letter-spacing: -0.01em;">Matty "Mike" Ice</h3>
+            <div class="text-gold text-xs mb-2" style="font-weight: 500; letter-spacing: 0.04em;">Senior Director of Direction</div>
+            <span class="badge mb-3">ex-Morgan Stanley</span>
+            <p class="text-muted text-xs leading-relaxed mt-2" style="font-weight: 300;">
+              "Left a six-figure career to do something more meaningful. We're still determining what that is."
+            </p>
+          </div>
+        </div>
+
+        <!-- Ryan Starr -->
+        <div class="team-card reveal reveal-delay-1">
+          <div class="relative" style="aspect-ratio: 3/4; overflow: hidden;">
+            <img src="brand_assets/Ryan Starr.png" alt="Ryan Starr" class="team-img w-full h-full object-cover object-top">
+            <div class="img-gradient"></div>
+          </div>
+          <div class="p-5 pt-3">
+            <h3 class="font-serif text-lg text-cream mb-0.5" style="font-weight: 800; letter-spacing: -0.01em;">Ryan Starr</h3>
+            <div class="text-gold text-xs mb-2" style="font-weight: 500; letter-spacing: 0.04em;">Head of Performance &amp; Competitive Intelligence</div>
+            <span class="badge mb-3">AEC Champion · Ring Holder</span>
+            <p class="text-muted text-xs leading-relaxed mt-2" style="font-weight: 300;">
+              "Mr. 400, took his NIL money and is mastering the art of Fortnite."
+            </p>
+          </div>
+        </div>
+
+        <!-- Evan Garbutt -->
+        <div class="team-card reveal reveal-delay-2">
+          <div class="relative" style="aspect-ratio: 3/4; overflow: hidden;">
+            <img src="brand_assets/Evan Garbutt.png" alt="Evan Garbutt" class="team-img w-full h-full object-cover object-top">
+            <div class="img-gradient"></div>
+          </div>
+          <div class="p-5 pt-3">
+            <h3 class="font-serif text-lg text-cream mb-0.5" style="font-weight: 800; letter-spacing: -0.01em;">Evan Garbutt</h3>
+            <div class="text-gold text-xs mb-2" style="font-weight: 500; letter-spacing: 0.04em;">Agentic Engineer</div>
+            <span class="badge mb-3">2-Stripe White Belt</span>
+            <p class="text-muted text-xs leading-relaxed mt-2" style="font-weight: 300;">
+              "He'll tickle your peach if you talk him right."
+            </p>
+          </div>
+        </div>
+
+        <!-- Jack Mahan -->
+        <div class="team-card reveal reveal-delay-3">
+          <div class="relative" style="aspect-ratio: 3/4; overflow: hidden;">
+            <img src="brand_assets/Jack Mahan.png" alt="Jack Mahan" class="team-img w-full h-full object-cover object-top">
+            <div class="img-gradient"></div>
+          </div>
+          <div class="p-5 pt-3">
+            <h3 class="font-serif text-lg text-cream mb-0.5" style="font-weight: 800; letter-spacing: -0.01em;">Jack Mahan</h3>
+            <div class="text-gold text-xs mb-2" style="font-weight: 500; letter-spacing: 0.04em;">Director of Hospitality &amp; Operational Strategy</div>
+            <span class="badge mb-3">ex-CBRE</span>
+            <p class="text-muted text-xs leading-relaxed mt-2" style="font-weight: 300;">
+              "Frequently bounces on cob, 7 figure portfolio of luxury hotels."
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CONTACT / CTA
+  ═══════════════════════════════════════════ -->
+  <section id="contact" style="padding: 8rem 0 4rem;">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <span class="rule-gold mx-auto mb-10 reveal" style="width: 48px;"></span>
+
+      <h2 class="font-serif text-cream mb-5 reveal contact-headline">
+        Your problems are expensive.
+      </h2>
+
+      <p class="text-muted text-base mb-10 reveal" style="font-weight: 300; max-width: 28rem; margin-left: auto; margin-right: auto; line-height: 1.7;">
+        Our time isn't free. But given the alternative, it probably is.
+      </p>
+
+      <a href="mailto:realo@consulting.com" class="btn-gold inline-block text-sm px-10 py-4 reveal" style="font-family: 'Inter', sans-serif;">
+        Get in Touch
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="padding: 2.5rem 0; border-top: 1px solid rgba(201,169,110,0.15);">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span class="font-serif text-gold text-sm" style="font-weight: 700; letter-spacing: 0.02em;">Real O-</span>
+      <span class="text-muted text-xs" style="letter-spacing: 0.04em;">
+        &copy; 2024 Real O-. All rights reserved. Northern Highlands, Class of 2018.
+      </span>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════
+       JS: Nav scroll + Reveal
+  ═══════════════════════════════════════════ -->
+  <script>
+    // Nav scroll state
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    }, { passive: true });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
